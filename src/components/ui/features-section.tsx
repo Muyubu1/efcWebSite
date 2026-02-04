@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { Dumbbell, Users, Heart, Timer, Award, Sparkles } from "lucide-react";
 
 // feature.md template'ine göre - Hizmetler bölümü
@@ -9,31 +10,36 @@ const services = [
         title: "Fitness & Ağırlık Antrenmanı",
         description: "Modern ekipmanlarla kişiye özel ağırlık ve dayanıklılık antrenmanları",
         icon: Dumbbell,
-        meta: "Fitness"
+        meta: "Fitness",
+        image: "/images/services/fitness.png"
     },
     {
         title: "Kadınlara Özel Grup Dersleri",
         description: "Pilates, yoga ve aerobik dersleri ile formda kalın",
         icon: Users,
-        meta: "Grup"
+        meta: "Grup",
+        image: "/images/services/group.png"
     },
     {
         title: "Kardiyo & Kondisyon",
         description: "Profesyonel kardiyo ekipmanları ile yağ yakımı ve kondisyon geliştirme",
         icon: Heart,
-        meta: "Kardiyo"
+        meta: "Kardiyo",
+        image: "/images/services/cardio.png"
     },
     {
         title: "Kişisel Antrenman",
         description: "Deneyimli antrenörlerimizle birebir özel antrenman seansları",
         icon: Timer,
-        meta: "PT"
+        meta: "PT",
+        image: "/images/services/personal.png"
     },
     {
         title: "Beslenme Danışmanlığı",
         description: "Hedeflerinize uygun kişiselleştirilmiş beslenme programları",
         icon: Sparkles,
-        meta: "Diyet"
+        meta: "Diyet",
+        image: "/images/services/nutrition.png"
     },
 ];
 
@@ -50,35 +56,52 @@ function BentoCard({
     title,
     description,
     icon: Icon,
-    meta
+    meta,
+    image
 }: {
     span?: string;
     title: string;
     description: string;
     icon: React.ElementType;
     meta: string;
+    image: string;
 }) {
     return (
         <article
-            className={`group relative overflow-hidden rounded-2xl border border-[#D4A836]/20 bg-black/40 p-6 transition-all duration-300 hover:border-[#D4A836]/50 hover:bg-black/60 ${span}`}
+            className={`group relative overflow-hidden rounded-2xl border border-[#D4A836]/20 p-6 transition-all duration-300 hover:border-[#D4A836]/50 ${span}`}
         >
-            <header className="mb-4 flex items-start justify-between">
-                <div className="p-3 rounded-xl bg-[#D4A836]/10 text-[#D4A836]">
-                    <Icon className="w-6 h-6" />
-                </div>
-                {meta && (
-                    <span className="rounded-full border border-[#D4A836]/30 bg-[#D4A836]/10 px-3 py-1 text-[10px] uppercase tracking-wide text-[#D4A836]">
-                        {meta}
-                    </span>
-                )}
-            </header>
-            <h3 className="text-lg md:text-xl font-semibold text-white mb-2">
-                {title}
-            </h3>
-            <p className="text-sm text-gray-400">{description}</p>
+            {/* Background Image */}
+            <Image
+                src={image}
+                alt={title}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                sizes="(max-width: 768px) 100vw, 50vw"
+            />
+
+            {/* Dark Overlay for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/70 to-black/50 transition-all duration-300 group-hover:from-black/95 group-hover:via-black/75 group-hover:to-black/60" />
+
+            {/* Content */}
+            <div className="relative z-10">
+                <header className="mb-4 flex items-start justify-between">
+                    <div className="p-3 rounded-xl bg-[#D4A836]/20 backdrop-blur-sm text-[#D4A836] border border-[#D4A836]/30">
+                        <Icon className="w-6 h-6" />
+                    </div>
+                    {meta && (
+                        <span className="rounded-full border border-[#D4A836]/40 bg-[#D4A836]/20 backdrop-blur-sm px-3 py-1 text-[10px] uppercase tracking-wide text-[#D4A836] font-semibold">
+                            {meta}
+                        </span>
+                    )}
+                </header>
+                <h3 className="text-lg md:text-xl font-bold text-white mb-2 drop-shadow-lg">
+                    {title}
+                </h3>
+                <p className="text-sm text-gray-200 drop-shadow-md">{description}</p>
+            </div>
 
             {/* Hover glow effect */}
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#D4A836]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#D4A836]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20" />
         </article>
     );
 }
@@ -115,6 +138,7 @@ export function FeaturesSection() {
                             description={service.description}
                             icon={service.icon}
                             meta={service.meta}
+                            image={service.image}
                         />
                     ))}
                 </div>
