@@ -146,11 +146,11 @@ export function FeaturesSection() {
                 {/* Bottom CTA */}
                 <div className="mt-12 text-center">
                     <a
-                        href="tel:+905326699357"
+                        href="#fiyatlar"
                         className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#D4A836] text-black font-semibold text-lg hover:bg-[#E6B93D] transition-colors"
                     >
                         <Award className="w-5 h-5" />
-                        Ücretsiz Deneme Dersi Al
+                        Hemen Üye Ol
                     </a>
                 </div>
             </div>

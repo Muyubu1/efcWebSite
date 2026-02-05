@@ -6,6 +6,7 @@ import { BeforeAfterSection } from "@/components/ui/before-after-section";
 import { PricingSection } from "@/components/ui/pricing-section";
 import { BMICalculator } from "@/components/ui/bmi-calculator";
 import { InstagramFeed } from "@/components/ui/instagram-feed";
+import { GoogleReviews } from "@/components/ui/google-reviews";
 import { FAQSection } from "@/components/ui/faq-section";
 import { Footer } from "@/components/ui/footer";
 import { WhatsAppFAB } from "@/components/ui/whatsapp-fab";
@@ -31,14 +32,17 @@ export default function Home() {
       {/* Pricing */}
       <PricingSection />
 
-      {/* BMI Calculator */}
-      <BMICalculator />
-
       {/* Instagram Feed */}
       <InstagramFeed />
 
+      {/* Google Reviews */}
+      <GoogleReviews />
+
       {/* FAQ */}
       <FAQSection />
+
+      {/* BMI Calculator - Footer üstünde */}
+      <BMICalculator />
 
       {/* Footer with Map & Contact */}
       <Footer />

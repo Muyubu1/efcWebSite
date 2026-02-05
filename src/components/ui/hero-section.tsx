@@ -102,12 +102,12 @@ export function HeroSection() {
                     className="mt-8 flex flex-col sm:flex-row gap-4"
                 >
                     <motion.a
-                        href="tel:+905326699357"
+                        href="#fiyatlar"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className="px-8 py-4 rounded-full bg-[#D4A836] text-black font-semibold text-lg shadow-lg shadow-[#D4A836]/30 transition-all hover:bg-[#E6B93D] focus:outline-none focus:ring-2 focus:ring-[#D4A836] focus:ring-opacity-75"
                     >
-                        Ücretsiz Deneme Dersi
+                        Hemen Üye Ol
                     </motion.a>
                     <motion.a
                         href="#fiyatlar"

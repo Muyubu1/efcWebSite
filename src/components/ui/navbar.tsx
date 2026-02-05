@@ -54,9 +54,9 @@ export function Navbar() {
 
     const navLinksData = [
         { label: 'Ana Sayfa', href: '#hero' },
+        { label: 'Galeri', href: '#galeri' },
         { label: 'Hizmetler', href: '#hizmetler' },
         { label: 'Fiyatlar', href: '#fiyatlar' },
-        { label: 'Galeri', href: '#galeri' },
         { label: 'İletişim', href: '#iletisim' },
     ];
 

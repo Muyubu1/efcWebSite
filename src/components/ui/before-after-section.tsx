@@ -2,151 +2,151 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { ChevronUp, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
-// Before-After verisi (dikey format)
+// Before-After verisi - Gerçek müşteri görselleri
 const beforeAfterData = [
     {
         id: 1,
         name: "Ahmet K.",
         duration: "6 ay",
-        before: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=600&fit=crop",
-        after: "https://images.unsplash.com/photo-1583454155184-870a1f63be09?w=400&h=600&fit=crop",
+        before: "/before-after/before1.png",
+        after: "/before-after/after1.png",
     },
     {
         id: 2,
         name: "Mehmet Y.",
         duration: "8 ay",
-        before: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=600&fit=crop",
-        after: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=600&fit=crop",
+        before: "/before-after/before2.png",
+        after: "/before-after/after2.png",
     },
     {
         id: 3,
         name: "Ayşe S.",
         duration: "4 ay",
-        before: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=600&fit=crop",
-        after: "https://images.unsplash.com/photo-1571731956672-f2b94d7dd0cb?w=400&h=600&fit=crop",
+        before: "/before-after/before3.png",
+        after: "/before-after/after3.png",
     },
 ];
 
-// Dikey slider component
-function VerticalComparisonSlider({
+// Flip Card Component - GPU accelerated
+function FlipCard({
     beforeImage,
     afterImage,
-    className,
+    name,
+    duration,
+    autoFlipDelay = 4000,
 }: {
     beforeImage: string;
     afterImage: string;
-    className?: string;
+    name: string;
+    duration: string;
+    autoFlipDelay?: number;
 }) {
-    const [sliderPosition, setSliderPosition] = React.useState(50);
-    const [isDragging, setIsDragging] = React.useState(false);
-    const containerRef = React.useRef<HTMLDivElement>(null);
-    const autoAnimateRef = React.useRef<NodeJS.Timeout | null>(null);
+    const [isFlipped, setIsFlipped] = React.useState(false);
+    const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
-    // Otomatik animasyon
+    // Otomatik flip
     React.useEffect(() => {
-        let direction = 1;
-        autoAnimateRef.current = setInterval(() => {
-            if (!isDragging) {
-                setSliderPosition((prev) => {
-                    if (prev >= 80) direction = -1;
-                    if (prev <= 20) direction = 1;
-                    return prev + direction * 0.5;
-                });
+        intervalRef.current = setInterval(() => {
+            setIsFlipped(prev => !prev);
+        }, autoFlipDelay);
+
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
             }
-        }, 50);
-
-        return () => {
-            if (autoAnimateRef.current) clearInterval(autoAnimateRef.current);
         };
-    }, [isDragging]);
+    }, [autoFlipDelay]);
 
-    const handleMove = (clientY: number) => {
-        if (!containerRef.current) return;
-        const rect = containerRef.current.getBoundingClientRect();
-        const y = clientY - rect.top;
-        let newPosition = (y / rect.height) * 100;
-        newPosition = Math.max(5, Math.min(95, newPosition));
-        setSliderPosition(newPosition);
-    };
+    // Tıklandığında flip ve timer'ı sıfırla
+    const handleClick = () => {
+        setIsFlipped(prev => !prev);
 
-    const handleMouseMove = (e: MouseEvent) => {
-        if (!isDragging) return;
-        handleMove(e.clientY);
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-        if (!isDragging) return;
-        handleMove(e.touches[0].clientY);
-    };
-
-    React.useEffect(() => {
-        if (isDragging) {
-            document.addEventListener("mousemove", handleMouseMove);
-            document.addEventListener("touchmove", handleTouchMove);
-            document.addEventListener("mouseup", () => setIsDragging(false));
-            document.addEventListener("touchend", () => setIsDragging(false));
+        // Timer'ı sıfırla
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
         }
-        return () => {
-            document.removeEventListener("mousemove", handleMouseMove);
-            document.removeEventListener("touchmove", handleTouchMove);
-        };
-    }, [isDragging]);
+        intervalRef.current = setInterval(() => {
+            setIsFlipped(prev => !prev);
+        }, autoFlipDelay);
+    };
 
     return (
         <div
-            ref={containerRef}
-            className={cn("relative overflow-hidden select-none group cursor-ns-resize", className)}
-            onMouseDown={() => setIsDragging(true)}
-            onTouchStart={() => setIsDragging(true)}
+            className="cursor-pointer group"
+            onClick={handleClick}
+            style={{ perspective: "1000px" }}
         >
-            {/* After Image (bottom layer) */}
-            <img
-                src={afterImage}
-                alt="Sonrası"
-                className="absolute inset-0 w-full h-full object-cover"
-                draggable={false}
-            />
-
-            {/* Before Image (top layer, clipped) */}
             <div
-                className="absolute inset-0 w-full h-full overflow-hidden"
-                style={{ clipPath: `polygon(0 0, 100% 0, 100% ${sliderPosition}%, 0 ${sliderPosition}%)` }}
+                className={cn(
+                    "relative w-full aspect-[3/4] transition-transform duration-700 ease-in-out",
+                    "transform-style-preserve-3d"
+                )}
+                style={{
+                    transformStyle: "preserve-3d",
+                    transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+                }}
             >
-                <img
-                    src={beforeImage}
-                    alt="Öncesi"
-                    className="w-full h-full object-cover"
-                    draggable={false}
-                />
-                {/* Before label */}
-                <div className="absolute top-4 left-4 px-3 py-1 bg-black/60 rounded-full text-xs text-white font-medium">
-                    Öncesi
-                </div>
-            </div>
-
-            {/* After label */}
-            <div className="absolute bottom-4 left-4 px-3 py-1 bg-[#D4A836]/80 rounded-full text-xs text-black font-medium">
-                Sonrası
-            </div>
-
-            {/* Slider Handle */}
-            <div
-                className="absolute left-0 w-full h-1 bg-[#D4A836]"
-                style={{ top: `calc(${sliderPosition}% - 2px)` }}
-            >
+                {/* Front - Before */}
                 <div
-                    className={cn(
-                        "absolute left-1/2 -translate-x-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center rounded-full bg-[#D4A836] shadow-lg",
-                        "transition-transform duration-200",
-                        isDragging && "scale-110"
-                    )}
+                    className="absolute inset-0 rounded-2xl overflow-hidden border-2 border-gray-200 bg-white shadow-xl"
+                    style={{ backfaceVisibility: "hidden" }}
                 >
-                    <div className="flex flex-col items-center text-black">
-                        <ChevronUp className="h-4 w-4 -mb-1" />
-                        <ChevronDown className="h-4 w-4 -mt-1" />
+                    <div className="relative w-full h-full bg-white">
+                        <Image
+                            src={beforeImage}
+                            alt="Öncesi"
+                            fill
+                            className="object-contain"
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                        />
+                        {/* Öncesi Badge */}
+                        <div className="absolute top-4 left-4 px-3 py-1.5 bg-gray-800 text-white text-sm font-semibold rounded-full shadow-lg">
+                            Öncesi
+                        </div>
+                        {/* Flip Hint */}
+                        <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/60 text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                            Tıkla ve çevir
+                        </div>
+                    </div>
+                    {/* Info */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                        <h3 className="text-white font-semibold text-lg">{name}</h3>
+                        <p className="text-gray-300 text-sm">{duration} sürede dönüşüm</p>
+                    </div>
+                </div>
+
+                {/* Back - After */}
+                <div
+                    className="absolute inset-0 rounded-2xl overflow-hidden border-2 border-[#D4A836] bg-white shadow-xl"
+                    style={{
+                        backfaceVisibility: "hidden",
+                        transform: "rotateY(180deg)"
+                    }}
+                >
+                    <div className="relative w-full h-full bg-white">
+                        <Image
+                            src={afterImage}
+                            alt="Sonrası"
+                            fill
+                            className="object-contain"
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                        />
+                        {/* Sonrası Badge */}
+                        <div className="absolute top-4 left-4 px-3 py-1.5 bg-[#D4A836] text-black text-sm font-semibold rounded-full shadow-lg">
+                            Sonrası ✨
+                        </div>
+                        {/* Flip Hint */}
+                        <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/60 text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                            Tıkla ve çevir
+                        </div>
+                    </div>
+                    {/* Info */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                        <h3 className="text-white font-semibold text-lg">{name}</h3>
+                        <p className="text-[#D4A836] text-sm font-medium">{duration} sürede dönüşüm 🎉</p>
                     </div>
                 </div>
             </div>
@@ -164,35 +164,27 @@ export function BeforeAfterSection() {
                         Başarı <span className="text-[#D4A836]">Hikayeleri</span>
                     </h2>
                     <p className="text-gray-400 max-w-2xl mx-auto">
-                        Üyelerimizin dönüşümlerine göz atın. Sizin hikayeniz de burada olabilir!
+                        Üyelerimizin dönüşümlerine göz atın. Kartlara tıklayarak öncesi ve sonrasını görün!
                     </p>
                 </div>
 
                 {/* Before-After Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {beforeAfterData.map((item, index) => (
                         <motion.div
                             key={item.id}
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            transition={{ delay: index * 0.1 }}
-                            className="group"
+                            transition={{ delay: index * 0.15 }}
                         >
-                            <div className="rounded-2xl overflow-hidden border border-[#D4A836]/20 bg-black/40">
-                                {/* Slider */}
-                                <VerticalComparisonSlider
-                                    beforeImage={item.before}
-                                    afterImage={item.after}
-                                    className="aspect-[3/4] rounded-t-2xl"
-                                />
-
-                                {/* Info */}
-                                <div className="p-4 text-center">
-                                    <h3 className="text-white font-semibold">{item.name}</h3>
-                                    <p className="text-[#D4A836] text-sm">{item.duration} sürede</p>
-                                </div>
-                            </div>
+                            <FlipCard
+                                beforeImage={item.before}
+                                afterImage={item.after}
+                                name={item.name}
+                                duration={item.duration}
+                                autoFlipDelay={4000 + index * 500} // Farklı zamanlarda dönsünler
+                            />
                         </motion.div>
                     ))}
                 </div>
