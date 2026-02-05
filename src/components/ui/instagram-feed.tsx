@@ -111,20 +111,32 @@ export function InstagramFeed() {
     };
 
     useEffect(() => {
-        // Instagram embed script'ini yükle
+        // Instagram embed script'ini yükle - hataları bastır
         const loadInstagramEmbed = () => {
-            if (window.instgrm) {
-                window.instgrm.Embeds.process();
-            } else {
-                const script = document.createElement("script");
-                script.src = "https://www.instagram.com/embed.js";
-                script.async = true;
-                script.onload = () => {
-                    if (window.instgrm) {
-                        window.instgrm.Embeds.process();
-                    }
-                };
-                document.body.appendChild(script);
+            try {
+                if (window.instgrm) {
+                    window.instgrm.Embeds.process();
+                } else {
+                    const script = document.createElement("script");
+                    script.src = "https://www.instagram.com/embed.js";
+                    script.async = true;
+                    script.crossOrigin = "anonymous";
+                    script.onload = () => {
+                        try {
+                            if (window.instgrm) {
+                                window.instgrm.Embeds.process();
+                            }
+                        } catch {
+                            // Instagram embed hatalarını sessizce yoksay
+                        }
+                    };
+                    script.onerror = () => {
+                        // Script yükleme hatalarını sessizce yoksay
+                    };
+                    document.body.appendChild(script);
+                }
+            } catch {
+                // Hataları sessizce yoksay
             }
         };
 
@@ -133,17 +145,29 @@ export function InstagramFeed() {
 
         // Cleanup
         return () => {
-            const scripts = document.querySelectorAll('script[src="https://www.instagram.com/embed.js"]');
-            scripts.forEach((script) => script.remove());
+            try {
+                const scripts = document.querySelectorAll('script[src="https://www.instagram.com/embed.js"]');
+                scripts.forEach((script) => script.remove());
+            } catch {
+                // Cleanup hatalarını yoksay
+            }
         };
     }, []);
 
     // visibleCount değiştiğinde embed'leri yeniden işle
     useEffect(() => {
-        if (window.instgrm) {
-            setTimeout(() => {
-                window.instgrm?.Embeds.process();
-            }, 100);
+        try {
+            if (window.instgrm) {
+                setTimeout(() => {
+                    try {
+                        window.instgrm?.Embeds.process();
+                    } catch {
+                        // Embed hatalarını sessizce yoksay
+                    }
+                }, 100);
+            }
+        } catch {
+            // Hataları sessizce yoksay
         }
     }, [visibleCount]);
 
